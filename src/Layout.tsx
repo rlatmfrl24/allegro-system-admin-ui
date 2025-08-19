@@ -1,9 +1,24 @@
 import type { ReactNode } from "react";
-import { Layout as RALayout, CheckForApplicationUpdate } from "react-admin";
+import {
+  Layout,
+  CheckForApplicationUpdate,
+  AppBar,
+  TitlePortal,
+} from "react-admin";
+import { Typography } from "@mui/material";
+import SideNavigation from "./SideNavigation";
 
-export const Layout = ({ children }: { children: ReactNode }) => (
-  <RALayout>
+export const MainLayout = ({ children }: { children: ReactNode }) => (
+  <Layout appBar={MainAppBar} sidebar={SideNavigation}>
     {children}
     <CheckForApplicationUpdate />
-  </RALayout>
+  </Layout>
+);
+
+const MainAppBar = () => (
+  <AppBar>
+    <TitlePortal>
+      <Typography variant="h6">System Admin</Typography>
+    </TitlePortal>
+  </AppBar>
 );

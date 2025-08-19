@@ -1,4 +1,8 @@
-import { Admin } from "react-admin";
-import { Layout } from "./Layout";
+import { Admin, Resource } from "react-admin";
+import { MainLayout } from "./Layout";
 
-export const App = () => <Admin layout={Layout}></Admin>;
+export const App = () => (
+  <Admin layout={MainLayout}>
+    <Resource name="users" />
+  </Admin>
+);
