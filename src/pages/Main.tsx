@@ -1,10 +1,10 @@
-import { Box, Card, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import mainLayer1 from "../assets/main-layer-1.svg";
 import mainLayer2 from "../assets/main-layer-2.svg";
-import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
 import { useState } from "react";
 import { useGetList } from "react-admin";
 import type { NavigationItem } from "../types/navigation";
+import { MainCard } from "./MainCard";
 
 const TARGET_NAV_ID = [
   "knowledge",
@@ -67,52 +67,11 @@ export const Main = () => {
               key={child.id}
               isExpanded={expandedId === child.id}
               onClick={() => handleCardClick(child.id)}
-              title={child.label}
-              description={""}
+              data={child}
             />
           ))}
         </Box>
       )}
-    </Box>
-  );
-};
-
-const MainCard = ({
-  title,
-  description,
-  isExpanded,
-  onClick,
-}: {
-  title: string;
-  description: string;
-  isExpanded: boolean;
-  onClick: () => void;
-}) => {
-  return (
-    <Box flex={1} height={isExpanded ? 640 : "fit-content"}>
-      <Card
-        sx={{ p: 3, borderRadius: 2, cursor: "pointer", height: "100%" }}
-        onClick={onClick}
-      >
-        <Box
-          color="#5E5ADB"
-          bgcolor="#EAE9FF"
-          width={48}
-          height={48}
-          borderRadius={99}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <AssistantOutlinedIcon sx={{ fontSize: 36 }} />
-        </Box>
-        <Typography fontSize={28} fontWeight={600} mt={2} mb={1}>
-          {title}
-        </Typography>
-        <Typography fontSize={16} fontWeight={400} color="#858E96">
-          {description}
-        </Typography>
-      </Card>
     </Box>
   );
 };
