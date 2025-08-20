@@ -32,8 +32,44 @@ export default function SideNavigation() {
     "knowledge-chunk": true,
   }));
 
-  const toggleExpand = (id: string) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  const collectDescendantIds = (item: MenuItem): string[] => {
+    if (!Array.isArray(item.children) || item.children.length === 0) {
+      return [];
+    }
+    return item.children.reduce<string[]>((acc, child) => {
+      acc.push(child.id, ...collectDescendantIds(child));
+      return acc;
+    }, []);
+  };
+
+  const handleToggleAtDepth = (id: string, siblings: MenuItem[]) => {
+    setExpanded((prev) => {
+      const isCurrentlyExpanded = !!prev[id];
+      const next: Record<string, boolean> = { ...prev };
+
+      // 닫아야 할 형제들과 그 하위들을 모두 닫음
+      siblings.forEach((sib) => {
+        if (sib.id !== id) {
+          delete next[sib.id];
+          const descendantIds = collectDescendantIds(sib);
+          descendantIds.forEach((dId) => delete next[dId]);
+        }
+      });
+
+      // 클릭한 항목 토글 및 하위 정리
+      if (isCurrentlyExpanded) {
+        delete next[id];
+        const clicked = siblings.find((s) => s.id === id);
+        if (clicked) {
+          const descendantIds = collectDescendantIds(clicked);
+          descendantIds.forEach((dId) => delete next[dId]);
+        }
+      } else {
+        next[id] = true;
+      }
+
+      return next;
+    });
   };
 
   const menuItems = useMemo(() => NAV_ITEMS as MenuItem[], []);
@@ -101,7 +137,9 @@ export default function SideNavigation() {
         <Box key={item.id} sx={{ backgroundColor: stylesByDepth.containerBg }}>
           <ListItemButton
             onClick={
-              hasChildren ? () => toggleExpand(item.id) : () => toggleSidebar()
+              hasChildren
+                ? () => handleToggleAtDepth(item.id, items)
+                : () => toggleSidebar()
             }
             sx={{
               pl: stylesByDepth.paddingLeft,

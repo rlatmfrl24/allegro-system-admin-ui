@@ -4,7 +4,15 @@ import SideNavigation from "./SideNavigation";
 import { MainAppBar } from "./components/MainAppBar";
 
 export const MainLayout = ({ children }: { children: ReactNode }) => (
-  <RaLayout appBar={MainAppBar} sidebar={SideNavigation}>
+  <RaLayout
+    appBar={MainAppBar}
+    sidebar={SideNavigation}
+    sx={{
+      "& .RaLayout-content": {
+        padding: 0,
+      },
+    }}
+  >
     {children}
   </RaLayout>
 );
