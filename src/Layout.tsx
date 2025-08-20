@@ -1,9 +1,18 @@
 import type { ReactNode } from "react";
-import { Layout as RALayout, CheckForApplicationUpdate } from "react-admin";
+import { Layout as RaLayout } from "react-admin";
+import SideNavigation from "./SideNavigation";
+import { MainAppBar } from "./components/MainAppBar";
 
-export const Layout = ({ children }: { children: ReactNode }) => (
-  <RALayout>
+export const MainLayout = ({ children }: { children: ReactNode }) => (
+  <RaLayout
+    appBar={MainAppBar}
+    sidebar={SideNavigation}
+    sx={{
+      "& .RaLayout-content": {
+        padding: 0,
+      },
+    }}
+  >
     {children}
-    <CheckForApplicationUpdate />
-  </RALayout>
+  </RaLayout>
 );

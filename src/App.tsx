@@ -1,4 +1,16 @@
-import { Admin } from "react-admin";
-import { Layout } from "./Layout";
+// ... existing code ...
+import { Admin, CustomRoutes, Resource } from "react-admin";
+import { Route, Navigate } from "react-router-dom"; // Navigate import 추가
+import { MainLayout } from "./Layout";
+import { Main } from "./pages/Main";
+import { NotFound } from "./pages/NotFound";
 
-export const App = () => <Admin layout={Layout}></Admin>;
+export const App = () => (
+  <Admin layout={MainLayout} error={NotFound}>
+    <Resource name="chunks" />
+    <CustomRoutes>
+      <Route path="/" element={<Navigate to="/main" replace />} />
+      <Route path="/main" element={<Main />} />
+    </CustomRoutes>
+  </Admin>
+);
