@@ -1,6 +1,5 @@
-// ... existing code ...
 import { Admin, CustomRoutes, Resource } from "react-admin";
-import { Route, Navigate } from "react-router-dom"; // Navigate import 추가
+import { Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./Layout";
 import { Main } from "./pages/Main";
 import { NotFound } from "./pages/NotFound";
