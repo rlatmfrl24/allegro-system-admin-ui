@@ -2,45 +2,77 @@ import { Box, Card, Typography } from "@mui/material";
 import mainLayer1 from "../assets/main-layer-1.svg";
 import mainLayer2 from "../assets/main-layer-2.svg";
 import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
+import { useState } from "react";
+import { useGetList } from "react-admin";
+import type { NavigationItem } from "../types/navigation";
+
+const TARGET_NAV_ID = [
+  "knowledge",
+  "chatbot-settings",
+  "settings",
+  "customer-support",
+];
 
 export const Main = () => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const { data: navItems, isPending } = useGetList<NavigationItem>("navMenu", {
+    sort: { field: "index", order: "ASC" },
+  });
+
+  const handleCardClick = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  const targetNavItems = navItems
+    ? TARGET_NAV_ID.map((id) => navItems.find((item) => item.id === id))
+        .filter((item): item is NavigationItem => !!item)
+        .sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
+    : [];
+
   return (
-    <Box
-      position="relative"
-      display="flex"
-      flexDirection={"column"}
-      height="100%"
-    >
+    <Box position="relative" height="100%">
       <Box position="absolute" top={0} right={0} zIndex={1}>
         <img src={mainLayer1} alt="main-layer-1" />
       </Box>
       <Box position="absolute" top={0} right={493} zIndex={1}>
         <img src={mainLayer2} alt="main-layer-2" />
       </Box>
-      <Box zIndex={2} display="flex" alignItems="center" height="100%">
-        <Typography fontSize={45} fontWeight={600} ml={5} lineHeight={"52px"}>
-          ALLEGRO NX System Admin
-          <br /> super easy and quick for everyone.
-        </Typography>
-      </Box>
-      <Box zIndex={3} p={5} gap={3} display="flex" alignItems="center">
-        <MainCard
-          title="챗봇 응답 지식 관리"
-          description="Additional description of this menu"
-        />
-        <MainCard
-          title="Comming Soon"
-          description="Additional description of this menu"
-        />
-        <MainCard
-          title="Comming Soon"
-          description="Additional description of this menu"
-        />
-        <MainCard
-          title="Comming Soon"
-          description="Additional description of this menu"
-        />
-      </Box>
+      <Typography
+        fontSize={45}
+        fontWeight={600}
+        lineHeight={"52px"}
+        position="absolute"
+        top={247}
+        left={40}
+      >
+        ALLEGRO NX System Admin
+        <br /> super easy and quick for everyone.
+      </Typography>
+
+      {!isPending && targetNavItems?.length > 0 && (
+        <Box
+          zIndex={3}
+          p={5}
+          gap={3}
+          display="flex"
+          alignItems="flex-end"
+          position="absolute"
+          bottom={0}
+          left={0}
+          width="100%"
+        >
+          {targetNavItems.map((child) => (
+            <MainCard
+              key={child.id}
+              isExpanded={expandedId === child.id}
+              onClick={() => handleCardClick(child.id)}
+              title={child.label}
+              description={""}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
@@ -48,13 +80,20 @@ export const Main = () => {
 const MainCard = ({
   title,
   description,
+  isExpanded,
+  onClick,
 }: {
   title: string;
   description: string;
+  isExpanded: boolean;
+  onClick: () => void;
 }) => {
   return (
-    <Box flex={1}>
-      <Card sx={{ p: 3, borderRadius: 2, cursor: "pointer" }}>
+    <Box flex={1} height={isExpanded ? 640 : "fit-content"}>
+      <Card
+        sx={{ p: 3, borderRadius: 2, cursor: "pointer", height: "100%" }}
+        onClick={onClick}
+      >
         <Box
           color="#5E5ADB"
           bgcolor="#EAE9FF"

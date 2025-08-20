@@ -8,7 +8,7 @@ import {
   Collapse,
   ListItemIcon,
 } from "@mui/material";
-import { useDataProvider, useLocale, useSidebarState } from "react-admin";
+import { useGetList, useLocale, useSidebarState } from "react-admin";
 import { theme } from "../Theme";
 import { MenuOpen } from "@mui/icons-material";
 import { useEffect, useState } from "react";
@@ -22,7 +22,9 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 type MenuItem = NavigationItem;
 
 export default function SideNavigation() {
-  const dataProvider = useDataProvider();
+  const { data: navItems, isPending } = useGetList<NavigationItem>("navMenu", {
+    sort: { field: "index", order: "ASC" },
+  });
 
   const [open, setOpen] = useSidebarState();
   useLocale();
@@ -73,36 +75,7 @@ export default function SideNavigation() {
     });
   };
 
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    let isActive = true;
-    setLoading(true);
-    dataProvider
-      .getList<MenuItem>("navMenu", {
-        pagination: { page: 1, perPage: 1000 },
-        sort: { field: "id", order: "ASC" },
-        filter: {},
-      })
-      .then((result) => {
-        if (!isActive) return;
-        const data = Array.isArray(result?.data) ? result.data : [];
-        setMenuItems(data);
-      })
-      .catch(() => {
-        if (!isActive) return;
-        setMenuItems([]);
-      })
-      .finally(() => {
-        if (!isActive) return;
-        setLoading(false);
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [dataProvider]);
+  const loading = isPending;
 
   useEffect(() => {
     if (!open) {
@@ -111,7 +84,15 @@ export default function SideNavigation() {
   }, [open]);
 
   const renderItems = (items: MenuItem[], depth = 0) => {
-    return items.map((item) => {
+    const sortedItems = items
+      .map((it, pos) => ({ it, pos }))
+      .sort((a, b) => {
+        const ai = a.it.index ?? a.pos;
+        const bi = b.it.index ?? b.pos;
+        return ai - bi;
+      })
+      .map(({ it }) => it);
+    return sortedItems.map((item) => {
       const hasChildren =
         Array.isArray(item.children) && item.children.length > 0;
       const isExpanded = !!expanded[item.id];
@@ -243,7 +224,7 @@ export default function SideNavigation() {
               <Typography variant="body2">메뉴 불러오는 중…</Typography>
             </Box>
           ) : (
-            <List disablePadding>{renderItems(menuItems)}</List>
+            <List disablePadding>{renderItems(navItems ?? [])}</List>
           )}
         </Box>
       </Box>
