@@ -8,18 +8,22 @@ import {
   Collapse,
   ListItemIcon,
 } from "@mui/material";
-import { useLocale, useSidebarState } from "react-admin";
-import { theme } from "./Theme";
+import { useDataProvider, useLocale, useSidebarState } from "react-admin";
+import { theme } from "../Theme";
 import { MenuOpen } from "@mui/icons-material";
-import { useEffect, useMemo, useState } from "react";
-import { NAV_ITEMS } from "./constants/navigation";
-import type { NavigationItem } from "./types/navigation";
+import { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+// import { NAV_ITEMS } from "../constants/navigation";
+import type { NavigationItem } from "../types/navigation";
 import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 type MenuItem = NavigationItem;
 
 export default function SideNavigation() {
+  const dataProvider = useDataProvider();
+
   const [open, setOpen] = useSidebarState();
   useLocale();
 
@@ -27,10 +31,7 @@ export default function SideNavigation() {
     setOpen(!open);
   };
 
-  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => ({
-    knowledge: true,
-    "knowledge-chunk": true,
-  }));
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => ({}));
 
   const collectDescendantIds = (item: MenuItem): string[] => {
     if (!Array.isArray(item.children) || item.children.length === 0) {
@@ -72,7 +73,36 @@ export default function SideNavigation() {
     });
   };
 
-  const menuItems = useMemo(() => NAV_ITEMS as MenuItem[], []);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isActive = true;
+    setLoading(true);
+    dataProvider
+      .getList<MenuItem>("navMenu", {
+        pagination: { page: 1, perPage: 1000 },
+        sort: { field: "id", order: "ASC" },
+        filter: {},
+      })
+      .then((result) => {
+        if (!isActive) return;
+        const data = Array.isArray(result?.data) ? result.data : [];
+        setMenuItems(data);
+      })
+      .catch(() => {
+        if (!isActive) return;
+        setMenuItems([]);
+      })
+      .finally(() => {
+        if (!isActive) return;
+        setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [dataProvider]);
 
   useEffect(() => {
     if (!open) {
@@ -200,7 +230,21 @@ export default function SideNavigation() {
           </IconButton>
         </Box>
         <Box>
-          <List disablePadding>{renderItems(menuItems)}</List>
+          {loading ? (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              height={200}
+              flexDirection="column"
+              sx={{ color: "#ffffff" }}
+            >
+              <CircularProgress size={28} sx={{ color: "#ffffff", mb: 1 }} />
+              <Typography variant="body2">메뉴 불러오는 중…</Typography>
+            </Box>
+          ) : (
+            <List disablePadding>{renderItems(menuItems)}</List>
+          )}
         </Box>
       </Box>
     </Drawer>

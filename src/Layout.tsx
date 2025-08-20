@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Layout as RaLayout } from "react-admin";
-import SideNavigation from "./SideNavigation";
+import SideNavigation from "./components/SideNavigation";
 import { MainAppBar } from "./components/MainAppBar";
 
 export const MainLayout = ({ children }: { children: ReactNode }) => (
