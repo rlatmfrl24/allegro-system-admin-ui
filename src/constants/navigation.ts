@@ -1,18 +1,11 @@
-interface MenuItem {
-  label: string;
-  id: string;
-  children?: MenuItem[];
-}
+import type { NavigationItem } from "../types/navigation";
 
-const FakeMenuItems: MenuItem[] = [
+export const NAV_ITEMS: NavigationItem[] = [
   {
     label: "챗봇 응답 지식 관리",
     id: "knowledge",
     children: [
-      {
-        label: "지식 청크 관리",
-        id: "knowledge-chunk",
-      },
+      { label: "지식 청크 관리", id: "knowledge-chunk" },
       {
         label: "Commercial",
         id: "commercial",
@@ -24,34 +17,13 @@ const FakeMenuItems: MenuItem[] = [
           { label: "Container Business Performance(CBP)", id: "cbp" },
         ],
       },
-      {
-        label: "Customer Service",
-        id: "customer-service",
-      },
-      {
-        label: "Logistics",
-        id: "logistics",
-      },
-      {
-        label: "Equipment",
-        id: "equipment",
-      },
-      {
-        label: "Vessel",
-        id: "vessel",
-      },
-      {
-        label: "Finance",
-        id: "finance",
-      },
-      {
-        label: "인텐트 관리",
-        id: "intent-management",
-      },
-      {
-        label: "API 관리",
-        id: "api-management",
-      },
+      { label: "Customer Service", id: "customer-service" },
+      { label: "Logistics", id: "logistics" },
+      { label: "Equipment", id: "equipment" },
+      { label: "Vessel", id: "vessel" },
+      { label: "Finance", id: "finance" },
+      { label: "인텐트 관리", id: "intent-management" },
+      { label: "API 관리", id: "api-management" },
     ],
   },
   {
@@ -214,5 +186,3 @@ const FakeMenuItems: MenuItem[] = [
     ],
   },
 ];
-
-export { FakeMenuItems };

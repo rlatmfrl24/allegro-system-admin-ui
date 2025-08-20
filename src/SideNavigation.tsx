@@ -11,16 +11,13 @@ import {
 import { useLocale, useSidebarState } from "react-admin";
 import { theme } from "./Theme";
 import { MenuOpen } from "@mui/icons-material";
-import { useMemo, useState } from "react";
-import { FakeMenuItems } from "./constants";
+import { useEffect, useMemo, useState } from "react";
+import { NAV_ITEMS } from "./constants/navigation";
+import type { NavigationItem } from "./types/navigation";
 import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-type MenuItem = {
-  label: string;
-  id: string;
-  children?: MenuItem[];
-};
+type MenuItem = NavigationItem;
 
 export default function SideNavigation() {
   const [open, setOpen] = useSidebarState();
@@ -39,7 +36,13 @@ export default function SideNavigation() {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const menuItems = useMemo(() => FakeMenuItems as MenuItem[], []);
+  const menuItems = useMemo(() => NAV_ITEMS as MenuItem[], []);
+
+  useEffect(() => {
+    if (!open) {
+      setExpanded({} as Record<string, boolean>);
+    }
+  }, [open]);
 
   const renderItems = (items: MenuItem[], depth = 0) => {
     return items.map((item) => {
