@@ -6,13 +6,15 @@ import {
   ListItemButton,
   ListItemText,
   Collapse,
-  Divider,
+  ListItemIcon,
 } from "@mui/material";
 import { useLocale, useSidebarState } from "react-admin";
 import { theme } from "./Theme";
 import { MenuOpen } from "@mui/icons-material";
 import { useMemo, useState } from "react";
 import { FakeMenuItems } from "./constants";
+import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 type MenuItem = {
   label: string;
@@ -57,41 +59,47 @@ export default function SideNavigation() {
           if (isExpanded) {
             return {
               ...style,
-              containerBg: theme.palette.signature.main,
+              containerBg: "#4C4A76",
               fontSize: 16,
             } as const;
           }
           return style;
         }
         if (depth === 1) {
-          return {
-            containerBg: theme.palette.signature.main,
+          const style = {
+            containerBg: theme.palette.signature.dark,
             textColor: "#ffffff",
             fontSize: 14,
-            paddingLeft: 4,
+            paddingLeft: 7,
             height: 36,
           } as const;
+          if (hasChildren && isExpanded) {
+            return {
+              ...style,
+              containerBg: "#4C4A76",
+              fontSize: 14,
+            } as const;
+          }
+          return style;
         }
         return {
           containerBg: "#ffffff",
           textColor: theme.palette.signature.dark,
           fontSize: 12,
-          paddingLeft: 6,
+          paddingLeft: 8,
           height: 32,
         } as const;
       })();
 
       const fontWeight = depth === 0 ? (isExpanded ? 600 : 400) : 600;
       const lineHeight = depth === 0 ? "24px" : depth === 1 ? "20px" : "16px";
-      let dividerBg = theme.palette.signature.main;
-      if (depth === 0) {
-        dividerBg = theme.palette.signature.dark;
-      }
 
       return (
         <Box key={item.id} sx={{ backgroundColor: stylesByDepth.containerBg }}>
           <ListItemButton
-            onClick={hasChildren ? () => toggleExpand(item.id) : undefined}
+            onClick={
+              hasChildren ? () => toggleExpand(item.id) : () => toggleSidebar()
+            }
             sx={{
               pl: stylesByDepth.paddingLeft,
               py: 0,
@@ -102,25 +110,35 @@ export default function SideNavigation() {
                 fontWeight,
                 lineHeight,
               },
+              borderBottom: "1px solid #ADB3B9",
             }}
           >
+            {depth === 0 && (
+              <ListItemIcon
+                sx={{ minWidth: 0, mr: 1, color: stylesByDepth.textColor }}
+              >
+                <AssistantOutlinedIcon />
+              </ListItemIcon>
+            )}
             <ListItemText primary={item.label} />
+            {hasChildren && (
+              <ArrowDropDownIcon
+                sx={{
+                  color: stylesByDepth.textColor,
+                  fontSize: 24,
+                  transition: "transform 0.3s ease-in-out",
+                  transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              />
+            )}
           </ListItemButton>
           {hasChildren && (
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-              {depth >= 2 ? null : (
-                <Divider
-                  sx={{
-                    backgroundColor: dividerBg,
-                  }}
-                />
-              )}
               <List disablePadding>
                 {renderItems(item.children!, depth + 1)}
               </List>
             </Collapse>
           )}
-          {depth >= 2 && <Divider sx={{ backgroundColor: "#ADB3B9" }} />}
         </Box>
       );
     });
@@ -128,7 +146,7 @@ export default function SideNavigation() {
 
   return (
     <Drawer open={open} onClose={toggleSidebar}>
-      <Box minWidth={368}>
+      <Box minWidth={368} bgcolor={"#2C2A56"} height={"100%"}>
         <Box
           bgcolor={theme.palette.signature.dark}
           height={54}
