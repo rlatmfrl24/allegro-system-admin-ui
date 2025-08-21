@@ -10,6 +10,7 @@ export const MainLayout = ({ children }: { children: ReactNode }) => (
     sx={{
       "& .RaLayout-content": {
         padding: 0,
+        backgroundColor: "#E5E9ED",
       },
     }}
   >

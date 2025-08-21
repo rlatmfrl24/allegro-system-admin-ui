@@ -1,10 +1,10 @@
-import { Box, Card, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import mainLayer1 from "../assets/main-layer-1.svg";
 import mainLayer2 from "../assets/main-layer-2.svg";
-import AssistantOutlinedIcon from "@mui/icons-material/AssistantOutlined";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetList } from "react-admin";
 import type { NavigationItem } from "../types/navigation";
+import { MainCard } from "../components/MainCard";
 
 const TARGET_NAV_ID = [
   "knowledge",
@@ -15,14 +15,31 @@ const TARGET_NAV_ID = [
 
 export const Main = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const { data: navItems, isPending } = useGetList<NavigationItem>("navMenu", {
     sort: { field: "index", order: "ASC" },
   });
 
   const handleCardClick = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
+    setExpandedId((prev) => (prev === id ? null : id));
   };
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!expandedId) return;
+      const currentRef = cardRefs.current[expandedId];
+      if (!currentRef) return;
+      const target = event.target as Node;
+      if (!currentRef.contains(target)) {
+        setExpandedId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleDocumentClick);
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentClick);
+    };
+  }, [expandedId]);
 
   const targetNavItems = navItems
     ? TARGET_NAV_ID.map((id) => navItems.find((item) => item.id === id))
@@ -31,7 +48,7 @@ export const Main = () => {
     : [];
 
   return (
-    <Box position="relative" height="100%">
+    <Box position="relative" height="100%" bgcolor="white">
       <Box position="absolute" top={0} right={0} zIndex={1}>
         <img src={mainLayer1} alt="main-layer-1" />
       </Box>
@@ -67,52 +84,14 @@ export const Main = () => {
               key={child.id}
               isExpanded={expandedId === child.id}
               onClick={() => handleCardClick(child.id)}
-              title={child.label}
-              description={""}
+              data={child}
+              ref={(el) => {
+                cardRefs.current[child.id] = el;
+              }}
             />
           ))}
         </Box>
       )}
-    </Box>
-  );
-};
-
-const MainCard = ({
-  title,
-  description,
-  isExpanded,
-  onClick,
-}: {
-  title: string;
-  description: string;
-  isExpanded: boolean;
-  onClick: () => void;
-}) => {
-  return (
-    <Box flex={1} height={isExpanded ? 640 : "fit-content"}>
-      <Card
-        sx={{ p: 3, borderRadius: 2, cursor: "pointer", height: "100%" }}
-        onClick={onClick}
-      >
-        <Box
-          color="#5E5ADB"
-          bgcolor="#EAE9FF"
-          width={48}
-          height={48}
-          borderRadius={99}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <AssistantOutlinedIcon sx={{ fontSize: 36 }} />
-        </Box>
-        <Typography fontSize={28} fontWeight={600} mt={2} mb={1}>
-          {title}
-        </Typography>
-        <Typography fontSize={16} fontWeight={400} color="#858E96">
-          {description}
-        </Typography>
-      </Card>
     </Box>
   );
 };
