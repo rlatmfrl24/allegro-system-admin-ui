@@ -4,7 +4,7 @@ import mainLayer2 from "../assets/main-layer-2.svg";
 import { useEffect, useRef, useState } from "react";
 import { useGetList } from "react-admin";
 import type { NavigationItem } from "../types/navigation";
-import { MainCard } from "./MainCard";
+import { MainCard } from "../components/MainCard";
 
 const TARGET_NAV_ID = [
   "knowledge",
@@ -48,7 +48,7 @@ export const Main = () => {
     : [];
 
   return (
-    <Box position="relative" height="100%">
+    <Box position="relative" height="100%" bgcolor="white">
       <Box position="absolute" top={0} right={0} zIndex={1}>
         <img src={mainLayer1} alt="main-layer-1" />
       </Box>
